@@ -1,4 +1,17 @@
-# Equity Merchants Deployment Guide
+# Equity Merchants
+
+A real estate listings site built with a GitHub Pages frontend and a Cloudflare Worker proxy for Airtable data.
+
+## Built with
+
+- HTML
+- CSS
+- JavaScript
+- Cloudflare Workers
+- Airtable
+- GitHub Pages
+
+## Deployment Guide
 
 This site is now set up to use:
 
