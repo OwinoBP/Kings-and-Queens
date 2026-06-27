@@ -1,6 +1,8 @@
 export default {
   async fetch(request, env) {
-    const allowedOrigin = env.ALLOWED_ORIGIN || "*";
+    const requestOrigin = request.headers.get("Origin");
+    const configuredOrigin = env.ALLOWED_ORIGIN || "*";
+    const allowedOrigin = configuredOrigin === "*" ? "*" : requestOrigin === configuredOrigin ? configuredOrigin : configuredOrigin;
     const corsHeaders = {
       "Access-Control-Allow-Origin": allowedOrigin,
       "Access-Control-Allow-Methods": "GET, POST, OPTIONS",
@@ -29,12 +31,12 @@ export default {
 
     try {
       const requestUrl = new URL(request.url);
-      const action = requestUrl.searchParams.get("action") || "list";
+      const action = (requestUrl.searchParams.get("action") || "list").trim().toLowerCase();
+      const recordId = (requestUrl.searchParams.get("id") || "").trim();
       const businessId = (requestUrl.searchParams.get("businessId") || "").replace(/'/g, "\\'");
       const endpoint = new URL(`https://api.airtable.com/v0/${env.AIRTABLE_BASE_ID}/${encodeURIComponent(env.AIRTABLE_TABLE_NAME)}`);
 
-      if (request.method === "GET" && action === "get") {
-        const recordId = requestUrl.searchParams.get("id");
+      if (request.method === "GET" && (action === "get" || recordId)) {
         if (!recordId) {
           return jsonResponse({ error: "Missing record id" }, 400, corsHeaders);
         }
@@ -151,6 +153,7 @@ function sanitizeRecord(record) {
       Price: fields.Price || "",
       Type: fields.Type || "",
       Description: fields.Description || "",
+      "Business ID": fields["Business ID"] || "",
       Photo: photo,
       PhotoBase64: fields.PhotoBase64 || null
     }

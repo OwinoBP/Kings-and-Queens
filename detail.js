@@ -89,14 +89,37 @@ async function loadDetail() {
   }
 
   try {
-    const response = await fetch(`${getWorkerUrl()}&action=get&id=${encodeURIComponent(recordId)}`);
-    const data = await response.json();
+    const workerUrl = new URL(getWorkerUrl());
+    workerUrl.searchParams.set('action', 'get');
+    workerUrl.searchParams.set('id', recordId);
 
-    if (!response.ok || data.error || !data.record) {
-      throw new Error(data.error || 'Unable to load property');
+    const response = await fetch(workerUrl.toString(), {
+      method: 'GET',
+      headers: { Accept: 'application/json' }
+    });
+    const responseText = await response.text();
+    let data;
+
+    try {
+      data = JSON.parse(responseText);
+    } catch (parseError) {
+      console.error('Unable to parse worker response:', responseText, parseError);
+      throw new Error('Invalid response from listing service.');
     }
 
-    const record = data.record;
+    console.debug('Detail worker response', data);
+
+    let record = data.record || null;
+    if (!record && Array.isArray(data.records)) {
+      record = data.records.find((item) => item && item.id === recordId) || data.records[0] || null;
+    }
+
+    if (!response.ok || data.error || !record) {
+      const errorMessage = data.error || `Unable to load property${recordId ? ` (${recordId})` : ''}`;
+      console.error('Detail fetch failed:', errorMessage, data);
+      throw new Error(errorMessage);
+    }
+
     const fields = record.fields || {};
     let photos = Array.isArray(fields.Photo) ? fields.Photo : [];
     // If no attachments, check for PhotoBase64 (stored as JSON string)
