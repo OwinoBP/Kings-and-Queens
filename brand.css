@@ -1,0 +1,44 @@
+:root {
+  --brand-primary: #003049;
+  --brand-secondary: #c1121f;
+  --brand-accent: #669bbc;
+  --brand-surface: #fffaf5;
+  --brand-heading: #07203b;
+  --brand-text: #1d1d1d;
+}
+
+/* Override core colors from styles.css */
+:root {
+  --navy: var(--brand-primary);
+  --crimson: var(--brand-secondary);
+  --sky: var(--brand-accent);
+  --cream: var(--brand-surface);
+  --charcoal: var(--brand-text);
+}
+
+.site-header {
+  background: rgba(0, 48, 73, 0.92);
+}
+
+.btn-primary {
+  background: var(--brand-primary);
+}
+
+.btn-secondary,
+.btn-whatsapp,
+.btn-outline:hover,
+.nav-links a:hover {
+  color: var(--white);
+}
+
+.hero {
+  background: linear-gradient(180deg, rgba(0, 48, 73, 0.08) 0%, rgba(255, 255, 255, 0.95) 100%);
+}
+
+.footer-brand {
+  color: var(--brand-primary);
+}
+
+.brand-logo {
+  max-width: 200px;
+}

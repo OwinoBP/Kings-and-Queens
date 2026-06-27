@@ -35,3 +35,52 @@ if (
 ) {
   adminNote.textContent = "This admin page is ready to share. Use it as the single bookmark for your client.";
 }
+
+// Pending submissions UI
+const retryBtn = document.getElementById('retry-pending-btn');
+const pendingCountEl = document.getElementById('pending-count');
+
+function pendingKey() { return 'pendingSubmissions'; }
+
+function updatePendingCount() {
+  try {
+    const list = JSON.parse(localStorage.getItem(pendingKey()) || '[]');
+    pendingCountEl.textContent = `${list.length} pending`;
+  } catch (e) {
+    pendingCountEl.textContent = '0 pending';
+  }
+}
+
+async function retryPending() {
+  try {
+    const list = JSON.parse(localStorage.getItem(pendingKey()) || '[]');
+    if (!list.length) return alert('No pending submissions');
+
+    const remaining = [];
+    for (const item of list) {
+      try {
+        const res = await fetch(getWorkerUrl(), {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(item.payload)
+        });
+        if (!res.ok) throw new Error('Retry failed');
+      } catch (err) {
+        remaining.push(item);
+      }
+    }
+
+    localStorage.setItem(pendingKey(), JSON.stringify(remaining));
+    updatePendingCount();
+    alert(`Retry complete. ${remaining.length} still pending.`);
+  } catch (e) {
+    console.error(e);
+    alert('Retry failed — check the console.');
+  }
+}
+
+if (retryBtn) {
+  retryBtn.addEventListener('click', retryPending);
+}
+
+updatePendingCount();

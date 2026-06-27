@@ -3,7 +3,7 @@ export default {
     const allowedOrigin = env.ALLOWED_ORIGIN || "*";
     const corsHeaders = {
       "Access-Control-Allow-Origin": allowedOrigin,
-      "Access-Control-Allow-Methods": "GET, OPTIONS",
+      "Access-Control-Allow-Methods": "GET, POST, OPTIONS",
       "Access-Control-Allow-Headers": "Content-Type",
       "Content-Type": "application/json; charset=utf-8"
     };
@@ -13,12 +13,6 @@ export default {
         status: 204,
         headers: corsHeaders
       });
-    }
-
-    if (request.method !== "GET") {
-      return jsonResponse({
-        error: "Method not allowed"
-      }, 405, corsHeaders);
     }
 
     if (!env.AIRTABLE_API_KEY || !env.AIRTABLE_BASE_ID || !env.AIRTABLE_TABLE_NAME) {
@@ -34,39 +28,107 @@ export default {
     }
 
     try {
+      const requestUrl = new URL(request.url);
+      const action = requestUrl.searchParams.get("action") || "list";
+      const businessId = (requestUrl.searchParams.get("businessId") || "").replace(/'/g, "\\'");
       const endpoint = new URL(`https://api.airtable.com/v0/${env.AIRTABLE_BASE_ID}/${encodeURIComponent(env.AIRTABLE_TABLE_NAME)}`);
-      endpoint.searchParams.set("filterByFormula", "{Status}='Active'");
-      const airtableResponse = await fetch(endpoint.toString(), {
-        headers: {
-          Authorization: `Bearer ${env.AIRTABLE_API_KEY}`
+
+      if (request.method === "GET" && action === "get") {
+        const recordId = requestUrl.searchParams.get("id");
+        if (!recordId) {
+          return jsonResponse({ error: "Missing record id" }, 400, corsHeaders);
         }
-      });
 
-      if (!airtableResponse.ok) {
-        const errorText = await airtableResponse.text();
+        const recordResponse = await fetch(`https://api.airtable.com/v0/${env.AIRTABLE_BASE_ID}/${encodeURIComponent(env.AIRTABLE_TABLE_NAME)}/${recordId}`, {
+          headers: { Authorization: `Bearer ${env.AIRTABLE_API_KEY}` }
+        });
 
-        return jsonResponse({
-          error: "Unable to fetch Airtable records",
-          details: errorText
-        }, airtableResponse.status, corsHeaders);
+        if (!recordResponse.ok) {
+          const errorText = await recordResponse.text();
+          return jsonResponse({ error: "Unable to fetch Airtable record", details: errorText }, recordResponse.status, corsHeaders);
+        }
+
+        const record = await recordResponse.json();
+        return jsonResponse({ record: sanitizeRecord(record) }, 200, corsHeaders);
       }
 
-      const data = await airtableResponse.json();
-      const records = Array.isArray(data.records) ? data.records : [];
+      if (request.method === "POST") {
+        const payload = await request.json().catch(() => ({}));
+        const fields = buildAirtableFields(payload);
+        const body = JSON.stringify({ fields });
 
-      const sanitizedRecords = records.map((record) => sanitizeRecord(record));
+        const airtableResponse = await fetch(endpoint, {
+          method: "POST",
+          headers: {
+            Authorization: `Bearer ${env.AIRTABLE_API_KEY}`,
+            "Content-Type": "application/json"
+          },
+          body
+        });
 
-      return jsonResponse({
-        records: sanitizedRecords
-      }, 200, corsHeaders);
+        const data = await airtableResponse.json().catch(() => ({}));
+        if (!airtableResponse.ok) {
+          return jsonResponse({ error: "Unable to create Airtable record", details: data }, airtableResponse.status, corsHeaders);
+        }
+
+        return jsonResponse({ recordId: data.id, record: sanitizeRecord(data) }, 200, corsHeaders);
+      }
+
+      if (request.method === "GET") {
+        let filterFormula = "{Status}='Active'";
+        if (businessId) {
+          filterFormula = `AND({Status}='Active', {Business ID}='${businessId}')`;
+        }
+
+        endpoint.searchParams.set("filterByFormula", filterFormula);
+        const airtableResponse = await fetch(endpoint.toString(), {
+          headers: {
+            Authorization: `Bearer ${env.AIRTABLE_API_KEY}`
+          }
+        });
+
+        if (!airtableResponse.ok) {
+          const errorText = await airtableResponse.text();
+          return jsonResponse({ error: "Unable to fetch Airtable records", details: errorText }, airtableResponse.status, corsHeaders);
+        }
+
+        const data = await airtableResponse.json();
+        const records = Array.isArray(data.records) ? data.records : [];
+        const sanitizedRecords = records.map((record) => sanitizeRecord(record));
+        return jsonResponse({ records: sanitizedRecords }, 200, corsHeaders);
+      }
+
+      return jsonResponse({ error: "Method not allowed" }, 405, corsHeaders);
     } catch (error) {
-      return jsonResponse({
-        error: "Unexpected worker error",
-        details: error instanceof Error ? error.message : "Unknown error"
-      }, 500, corsHeaders);
+      return jsonResponse({ error: "Unexpected worker error", details: error instanceof Error ? error.message : "Unknown error" }, 500, corsHeaders);
     }
   }
 };
+
+function buildAirtableFields(payload) {
+  const photoUrls = Array.isArray(payload.photoUrls) ? payload.photoUrls : [];
+  const fields = {
+    "Property Name": payload.propertyName || "",
+    Location: payload.location || "",
+    Price: payload.price || "",
+    Type: payload.type || "House",
+    Status: payload.status || "Active",
+    Description: payload.description || "",
+    "Business ID": payload.businessId || "",
+    Photo: photoUrls.map((url) => ({ url }))
+  };
+
+  // If the client uploaded files as data URLs, persist them in a text field
+  if (Array.isArray(payload.photoData) && payload.photoData.length) {
+    try {
+      fields['PhotoBase64'] = JSON.stringify(payload.photoData.slice(0, 10));
+    } catch (e) {
+      // ignore stringify errors
+    }
+  }
+
+  return fields;
+}
 
 function sanitizeRecord(record) {
   const fields = record.fields || {};

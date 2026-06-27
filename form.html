@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Property Form | Equity Merchants</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="styles.css">
+  <link rel="stylesheet" href="brand.css">
+</head>
+<body>
+  <header class="site-header">
+    <div class="container nav-wrap">
+      <a href="index.html" class="logo" aria-label="Equity Merchants home">
+        <img class="logo-mark" data-brand-logo src="Equity Merchants.png" alt="Equity Merchants logo">
+      </a>
+      <div class="nav-actions">
+        <a class="btn btn-outline" href="index.html">Back to Website</a>
+      </div>
+    </div>
+  </header>
+
+  <main>
+    <section class="admin-hero">
+      <div class="container">
+        <span class="admin-kicker">Property Entry</span>
+        <h1 class="section-heading">Add or update a listing with a shareable detail page.</h1>
+        <p class="section-copy">This form stores the listing in Airtable and creates a public detail page automatically after save.</p>
+      </div>
+    </section>
+
+    <section class="section">
+      <div class="container">
+        <div class="card" style="padding: 1.5rem;">
+          <form id="listing-form" class="contact-form">
+            <input type="hidden" id="record-id" name="recordId">
+            <input type="hidden" id="business-id" name="businessId" value="equity-merchants">
+
+            <div class="field">
+              <label for="property-name">Property Name</label>
+              <input id="property-name" name="propertyName" required>
+            </div>
+
+            <div class="field">
+              <label for="location">Location</label>
+              <input id="location" name="location" required>
+            </div>
+
+            <div class="field">
+              <label for="price">Price</label>
+              <input id="price" name="price" type="number" min="0" step="1000" required>
+            </div>
+
+            <div class="field">
+              <label for="type">Property Type</label>
+              <select id="type" name="type" required>
+                <option value="House">House</option>
+                <option value="Land">Land</option>
+                <option value="Commercial">Commercial</option>
+              </select>
+            </div>
+
+            <div class="field">
+              <label for="status">Status</label>
+              <select id="status" name="status" required>
+                <option value="Active">Active</option>
+                <option value="Inactive">Inactive</option>
+                <option value="Sold">Sold</option>
+              </select>
+            </div>
+
+            <div class="field">
+              <label for="description">Description</label>
+              <textarea id="description" name="description" required></textarea>
+            </div>
+
+            <div class="field">
+              <label for="photo-urls">Photo URLs</label>
+              <textarea id="photo-urls" name="photoUrls" placeholder="Paste one image URL per line"></textarea>
+            </div>
+
+            <div class="field">
+              <label for="photo-files">Or upload images</label>
+              <input id="photo-files" name="photoFiles" type="file" accept="image/*" multiple>
+              <div id="photo-previews" style="display:grid; grid-template-columns: repeat(auto-fill, minmax(120px,1fr)); gap:.5rem; margin-top:.5rem;"></div>
+            </div>
+
+            <div class="field">
+              <label for="share-link">Shareable link</label>
+              <input id="share-link" name="shareLink" readonly placeholder="Will appear after save">
+            </div>
+
+            <div class="form-actions" style="display:flex; flex-wrap: wrap; gap: .75rem;">
+              <button class="btn btn-primary" type="submit">Save Listing</button>
+              <a class="btn btn-outline" href="admin.html">Open Admin</a>
+            </div>
+
+            <p id="form-status" class="section-copy" style="margin-top: .5rem;"></p>
+          </form>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <footer class="site-footer">
+    <div class="container footer-bottom">
+      &copy; 2026 <span data-brand-site-name>Equity Merchants Ltd</span>. <span data-brand-credit>Built by Ujao Defined</span>.
+    </div>
+  </footer>
+
+  <script src="config.js" defer></script>
+  <script src="form.js" defer></script>
+</body>
+</html>

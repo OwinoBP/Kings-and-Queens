@@ -1,6 +1,6 @@
 // WhatsApp contact number used across the site.
-const WHATSAPP_NUMBER = "254759043208";
-const LISTINGS_API_URL = "https://equity-merchants-listings.ujao.workers.dev";
+const WHATSAPP_NUMBER = APP_CONFIG.whatsappNumber;
+const LISTINGS_API_URL = getWorkerUrl();
 const LISTINGS_PER_PAGE = 6;
 
 const navLinks = document.getElementById("nav-links");

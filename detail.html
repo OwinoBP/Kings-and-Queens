@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Property Details</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="styles.css">
+  <link rel="stylesheet" href="brand.css">
+</head>
+<body>
+  <header class="site-header">
+    <div class="container nav-wrap">
+      <a href="index.html" class="logo" aria-label="Equity Merchants home">
+        <img class="logo-mark" data-brand-logo src="Equity Merchants.png" alt="Equity Merchants logo">
+      </a>
+      <div class="nav-actions">
+        <a class="btn btn-outline" href="index.html">Back to Listings</a>
+      </div>
+    </div>
+  </header>
+
+  <main>
+    <section class="section">
+      <div class="container">
+        <div id="detail-loading" class="section-copy">Loading property details...</div>
+        <article id="detail-card" class="card" hidden style="padding: 1.5rem;">
+          <div id="detail-gallery" style="display:grid; gap: 1rem;"></div>
+          <h1 id="detail-title" class="section-heading"></h1>
+          <p id="detail-location" class="listing-meta"></p>
+          <div id="detail-price" class="modal-price"></div>
+          <p id="detail-description" class="section-copy"></p>
+          <div class="form-actions">
+            <a id="detail-whatsapp" class="btn btn-whatsapp" href="#" target="_blank" rel="noopener noreferrer">Ask on WhatsApp</a>
+          </div>
+        </article>
+      </div>
+    </section>
+  </main>
+
+  <footer class="site-footer">
+    <div class="container footer-bottom">
+      &copy; 2026 <span data-brand-site-name>Equity Merchants Ltd</span>. <span data-brand-credit>Built by Ujao Defined</span>.
+    </div>
+  </footer>
+
+  <script src="config.js" defer></script>
+  <script src="detail.js" defer></script>
+</body>
+</html>

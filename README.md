@@ -11,6 +11,17 @@ A real estate listings site built with a GitHub Pages frontend and a Cloudflare 
 - Airtable
 - GitHub Pages
 
+## Branding and client configuration
+
+This repo now supports:
+
+- a shared `styles.css` layout and component theme
+- a client-specific `brand.css` override file for colors and logos
+- a `config.js` file with `businessId`, `siteName`, `logoSrc`, and Airtable worker URL settings
+- a single Airtable base filtered by the `Business ID` field
+
+To customize for a client fork, update `config.js` and `brand.css` only.
+
 ## Deployment Guide
 
 This site is now set up to use:
