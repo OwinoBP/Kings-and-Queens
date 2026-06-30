@@ -320,16 +320,17 @@ button {
   background:
     radial-gradient(
       circle at top left,
-      rgba(193, 18, 31, 0.28),
-      transparent 30%
+      rgba(227, 201, 148, 0.22), /* Soft glowing champagne gold */
+      transparent 35%
     ),
     radial-gradient(
       circle at bottom right,
-      rgba(102, 155, 188, 0.26),
-      transparent 34%
+      rgba(140, 109, 49, 0.25), /* Deep warm bronze gold */
+      transparent 35%
     ),
-    linear-gradient(135deg, #00263b 0%, #003049 38%, #780000 100%);
+    linear-gradient(135deg, #0b0b0b 0%, #1c1c1c 38%, #121212 100%); /* Deep, rich black canvas */
   color: var(--white);
+
 }
 
 .hero {
