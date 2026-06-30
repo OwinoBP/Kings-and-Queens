@@ -141,10 +141,11 @@ button {
   position: sticky;
   top: 0;
   z-index: 1000;
-  background: rgba(0, 48, 73, 0.88);
+  background: rgba(253, 247, 242, 0.85); /* Bright frosted cream */
   backdrop-filter: blur(18px);
-  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+  border-bottom: 1px solid rgba(28, 28, 28, 0.08); /* Subtle dark border */
 }
+
 
 .nav-wrap {
   display: flex;
