@@ -108,18 +108,18 @@ function getBadgeClass(type) {
 }
 
 function normalizeListing(record) {
-  const fields = record.fields || {};
+  const fields = normalizeApiFields(record.fields || {});
 
   return {
     id: record.id,
     createdTime: record.createdTime ? new Date(record.createdTime) : new Date(0),
-    propertyName: fields["Property Name"] || fields.Name || "Untitled Property",
-    location: fields.Location || "Location available on request",
-    locationSlug: String(fields.Location || "").trim().toLowerCase(),
-    priceValue: Number(fields.Price) || 0,
-    price: formatKES(fields.Price),
-    type: fields.Type || "House",
-    description: fields.Description || "Contact us for more information about this property.",
+    propertyName: fields.propertyName || "Untitled Property",
+    location: fields.location || "Location available on request",
+    locationSlug: String(fields.location || "").trim().toLowerCase(),
+    priceValue: Number(fields.price) || 0,
+    price: formatKES(fields.price),
+    type: fields.type || "House",
+    description: fields.description || "Contact us for more information about this property.",
     photos: parseListingPhotos(fields)
   };
 }

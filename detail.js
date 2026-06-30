@@ -129,20 +129,20 @@ async function loadDetail() {
       throw new Error(errorMessage);
     }
 
-    const fields = record.fields || {};
+    const fields = normalizeApiFields(record.fields || {});
     let photos = parseListingPhotos(fields);
 
-    const listingTitle = fields['Property Name'] || 'Property';
-    const listingDescription = fields.Description || 'No description available.';
+    const listingTitle = fields.propertyName || 'Property';
+    const listingDescription = fields.description || 'No description available.';
     const previewImage = photos[0]?.url || APP_CONFIG.logoSrc || '';
 
     titleEl.textContent = listingTitle;
-    locationEl.textContent = fields.Location || 'Location available on request';
+    locationEl.textContent = fields.location || 'Location available on request';
     priceEl.textContent = new Intl.NumberFormat('en-KE', {
       style: 'currency',
       currency: 'KES',
       maximumFractionDigits: 0
-    }).format(Number(fields.Price) || 0);
+    }).format(Number(fields.price) || 0);
     descriptionEl.textContent = listingDescription;
     whatsappEl.href = `https://wa.me/${APP_CONFIG.whatsappNumber}?text=${encodeURIComponent(`Hello, I am interested in ${listingTitle}.`)}`;
     setShareMeta(previewImage, listingTitle, listingDescription);

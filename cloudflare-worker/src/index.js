@@ -1,3 +1,19 @@
+const DEFAULT_FIELD_CONFIG = {
+  fields: {
+    propertyName: "Property Name",
+    propertyNameFallback: "Name",
+    location: "Location",
+    price: "Price",
+    type: "Type",
+    status: "Status",
+    description: "Description",
+    businessId: "Business ID",
+    photo: "Photo",
+    photoBase64: "PhotoBase64"
+  },
+  activeStatus: "Active"
+};
+
 export default {
   async fetch(request, env) {
     const requestOrigin = request.headers.get("Origin") || "";
@@ -39,6 +55,7 @@ export default {
 
     try {
       const requestUrl = new URL(request.url);
+      const fieldConfig = parseFieldConfig(requestUrl);
       const action = (requestUrl.searchParams.get("action") || "list").trim().toLowerCase();
       const recordId = (requestUrl.searchParams.get("id") || "").trim();
       const businessId = (requestUrl.searchParams.get("businessId") || "").replace(/'/g, "\\'");
@@ -59,21 +76,22 @@ export default {
         }
 
         const record = await recordResponse.json();
-        return jsonResponse({ record: sanitizeRecord(record) }, 200, corsHeaders);
+        return jsonResponse({ record: sanitizeRecord(record, fieldConfig) }, 200, corsHeaders);
       }
 
       if (request.method === "POST") {
         const payload = await request.json().catch(() => ({}));
-        const fields = buildAirtableFields(payload);
+        const fields = buildAirtableFields(payload, fieldConfig);
         const updateRecordId = String(payload.recordId || "").trim();
+        const photoBase64Field = fieldConfig.fields.photoBase64;
 
         let airtableResponse = updateRecordId
           ? await patchAirtableRecord(updateRecordId, env, fields)
           : await createAirtableRecord(endpoint, env, fields);
         let data = await airtableResponse.json().catch(() => ({}));
 
-        if (!airtableResponse.ok && isFieldError(data, "PhotoBase64") && fields.PhotoBase64) {
-          delete fields.PhotoBase64;
+        if (!airtableResponse.ok && isFieldError(data, photoBase64Field) && fields[photoBase64Field]) {
+          delete fields[photoBase64Field];
           airtableResponse = updateRecordId
             ? await patchAirtableRecord(updateRecordId, env, fields)
             : await createAirtableRecord(endpoint, env, fields);
@@ -84,13 +102,14 @@ export default {
           return jsonResponse({ error: updateRecordId ? "Unable to update Airtable record" : "Unable to create Airtable record", details: data }, airtableResponse.status, corsHeaders);
         }
 
-        return jsonResponse({ recordId: data.id, record: sanitizeRecord(data) }, 200, corsHeaders);
+        return jsonResponse({ recordId: data.id, record: sanitizeRecord(data, fieldConfig) }, 200, corsHeaders);
       }
 
       if (request.method === "GET") {
-        let filterFormula = "{Status}='Active'";
+        const { fields, activeStatus } = fieldConfig;
+        let filterFormula = `{${fields.status}}='${escapeFormulaValue(activeStatus)}'`;
         if (businessId) {
-          filterFormula = `AND({Status}='Active', {Business ID}='${businessId}')`;
+          filterFormula = `AND({${fields.status}}='${escapeFormulaValue(activeStatus)}', {${fields.businessId}}='${businessId}')`;
         }
 
         endpoint.searchParams.set("filterByFormula", filterFormula);
@@ -107,7 +126,7 @@ export default {
 
         const data = await airtableResponse.json();
         const records = Array.isArray(data.records) ? data.records : [];
-        const sanitizedRecords = records.map((record) => sanitizeRecord(record));
+        const sanitizedRecords = records.map((record) => sanitizeRecord(record, fieldConfig));
         return jsonResponse({ records: sanitizedRecords }, 200, corsHeaders);
       }
 
@@ -117,6 +136,27 @@ export default {
     }
   }
 };
+
+function parseFieldConfig(requestUrl) {
+  const raw = requestUrl.searchParams.get("fieldConfig");
+  if (!raw) {
+    return DEFAULT_FIELD_CONFIG;
+  }
+
+  try {
+    const parsed = JSON.parse(raw);
+    return {
+      fields: { ...DEFAULT_FIELD_CONFIG.fields, ...(parsed.fields || {}) },
+      activeStatus: parsed.activeStatus || DEFAULT_FIELD_CONFIG.activeStatus
+    };
+  } catch (error) {
+    return DEFAULT_FIELD_CONFIG;
+  }
+}
+
+function escapeFormulaValue(value) {
+  return String(value || "").replace(/'/g, "\\'");
+}
 
 function createAirtableRecord(endpoint, env, fields) {
   return fetch(endpoint, {
@@ -146,26 +186,26 @@ function isFieldError(data, fieldName) {
     && String(data.error.message || "").includes(`"${fieldName}"`);
 }
 
-function buildAirtableFields(payload) {
+function buildAirtableFields(payload, fieldConfig) {
+  const map = fieldConfig.fields;
   const photoUrls = Array.isArray(payload.photoUrls) ? payload.photoUrls : [];
   const priceValue = String(payload.price || "").trim();
   const numericPrice = Number(priceValue);
   const fields = {
-    "Property Name": payload.propertyName || "",
-    Location: payload.location || "",
-    Price: priceValue && Number.isFinite(numericPrice) ? numericPrice : "",
-    Type: payload.type || "House",
-    Status: payload.status || "Active",
-    Description: payload.description || "",
-    "Business ID": payload.businessId || "",
-    Photo: photoUrls.map((url) => ({ url }))
+    [map.propertyName]: payload.propertyName || "",
+    [map.location]: payload.location || "",
+    [map.price]: priceValue && Number.isFinite(numericPrice) ? numericPrice : "",
+    [map.type]: payload.type || "House",
+    [map.status]: payload.status || fieldConfig.activeStatus,
+    [map.description]: payload.description || "",
+    [map.businessId]: payload.businessId || "",
+    [map.photo]: photoUrls.map((url) => ({ url }))
   };
 
-  // If the client uploaded files as data URLs, persist them in a text field
   if (Array.isArray(payload.photoData) && payload.photoData.length) {
     try {
-      fields['PhotoBase64'] = JSON.stringify(payload.photoData.slice(0, 10));
-    } catch (e) {
+      fields[map.photoBase64] = JSON.stringify(payload.photoData.slice(0, 10));
+    } catch (error) {
       // ignore stringify errors
     }
   }
@@ -173,10 +213,11 @@ function buildAirtableFields(payload) {
   return fields;
 }
 
-function sanitizeRecord(record) {
-  const fields = record.fields || {};
-  const photo = Array.isArray(fields.Photo)
-    ? fields.Photo
+function sanitizeRecord(record, fieldConfig) {
+  const map = fieldConfig.fields;
+  const raw = record.fields || {};
+  const photo = Array.isArray(raw[map.photo])
+    ? raw[map.photo]
         .filter((item) => item && item.url)
         .map((item) => ({
           url: item.url,
@@ -189,14 +230,15 @@ function sanitizeRecord(record) {
     id: record.id,
     createdTime: record.createdTime,
     fields: {
-      "Property Name": fields["Property Name"] || fields.Name || "",
-      Location: fields.Location || "",
-      Price: fields.Price || "",
-      Type: fields.Type || "",
-      Description: fields.Description || "",
-      "Business ID": fields["Business ID"] || "",
-      Photo: photo,
-      PhotoBase64: fields.PhotoBase64 || null
+      propertyName: raw[map.propertyName] || raw[map.propertyNameFallback] || "",
+      location: raw[map.location] || "",
+      price: raw[map.price] || "",
+      type: raw[map.type] || "",
+      status: raw[map.status] || "",
+      description: raw[map.description] || "",
+      businessId: raw[map.businessId] || "",
+      photo,
+      photoBase64: raw[map.photoBase64] || null
     }
   };
 }

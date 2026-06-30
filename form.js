@@ -136,15 +136,15 @@ async function loadListing(recordId) {
       throw new Error('Listing not found');
     }
 
-    const fields = record.fields || {};
-    document.getElementById('property-name').value = fields['Property Name'] || '';
-    document.getElementById('location').value = fields.Location || '';
-    document.getElementById('price').value = fields.Price || '';
-    document.getElementById('type').value = fields.Type || 'House';
-    document.getElementById('status').value = fields.Status || 'Active';
-    document.getElementById('description').value = fields.Description || '';
-    document.getElementById('photo-urls').value = Array.isArray(fields.Photo)
-      ? fields.Photo.map((photo) => photo.url || '').filter(Boolean).join('\n')
+    const fields = normalizeApiFields(record.fields || {});
+    document.getElementById('property-name').value = fields.propertyName || '';
+    document.getElementById('location').value = fields.location || '';
+    document.getElementById('price').value = fields.price || '';
+    document.getElementById('type').value = fields.type || 'House';
+    document.getElementById('status').value = fields.status || APP_CONFIG.activeListingStatus;
+    document.getElementById('description').value = fields.description || '';
+    document.getElementById('photo-urls').value = Array.isArray(fields.photo)
+      ? fields.photo.map((photo) => photo.url || '').filter(Boolean).join('\n')
       : '';
     photoData = parseListingPhotos(fields)
       .map((photo) => photo.url)
@@ -152,7 +152,7 @@ async function loadListing(recordId) {
     renderPhotoPreviews(photoData);
     recordIdEl.value = record.id;
     shareLinkEl.value = buildDetailUrl(record.id);
-    businessIdEl.value = fields['Business ID'] || APP_CONFIG.businessId;
+    businessIdEl.value = fields.businessId || APP_CONFIG.businessId;
   } catch (error) {
     console.error(error);
     setStatus('Unable to load listing for editing.', true);
@@ -171,7 +171,7 @@ form.addEventListener('submit', async (event) => {
     location: formData.get('location') || '',
     price: formData.get('price') || '',
     type: formData.get('type') || 'House',
-    status: formData.get('status') || 'Active',
+    status: formData.get('status') || APP_CONFIG.activeListingStatus,
     description: formData.get('description') || '',
     photoUrls: (formData.get('photoUrls') || '').split(/\n|,/).map((item) => item.trim()).filter(Boolean),
     photoData: photoData.slice()

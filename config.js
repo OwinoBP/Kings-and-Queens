@@ -23,12 +23,33 @@ const APP_CONFIG = {
   footerCreditUrl: "https://ujao-defined.com",
   airtableEditorUrl: "https://airtable.com/appwFq9FXqtf2cV6B/tbl7SBcj3I3jc0QbU",
   airtableAddFormUrl: "https://airtable.com/appwFq9FXqtf2cV6B/pagWEy5JYFErSCwn4/form",
-  airtableBaseUrl: "https://airtable.com/appwFq9FXqtf2cV6B"
+  airtableBaseUrl: "https://airtable.com/appwFq9FXqtf2cV6B",
+  activeListingStatus: "Active",
+  airtableFields: {
+    propertyName: "Property Name",
+    propertyNameFallback: "Name",
+    location: "Location",
+    price: "Price",
+    type: "Type",
+    status: "Status",
+    description: "Description",
+    businessId: "Business ID",
+    photo: "Photo",
+    photoBase64: "PhotoBase64"
+  }
 };
+
+function getFieldConfigPayload() {
+  return {
+    fields: APP_CONFIG.airtableFields,
+    activeStatus: APP_CONFIG.activeListingStatus
+  };
+}
 
 function getWorkerUrl() {
   const url = new URL(APP_CONFIG.workerBaseUrl);
   url.searchParams.set("businessId", APP_CONFIG.businessId);
+  url.searchParams.set("fieldConfig", JSON.stringify(getFieldConfigPayload()));
   return url.toString();
 }
 
@@ -36,14 +57,52 @@ function getGenericWhatsAppMessage() {
   return `Hello ${APP_CONFIG.siteName}, I would like to learn more about your available properties and services.`;
 }
 
-function parseListingPhotos(fields) {
-  let photos = Array.isArray(fields.Photo) ? fields.Photo : [];
+function getRequiredFieldLabels() {
+  const fields = APP_CONFIG.airtableFields;
+  return [
+    fields.propertyName,
+    fields.location,
+    fields.price,
+    fields.type,
+    fields.description,
+    fields.status,
+    fields.photo
+  ].join(", ");
+}
 
-  if ((!photos || !photos.length) && fields.PhotoBase64) {
+function normalizeApiFields(fields) {
+  if (!fields || typeof fields !== "object") {
+    return {};
+  }
+
+  if ("propertyName" in fields || "location" in fields) {
+    return fields;
+  }
+
+  const map = APP_CONFIG.airtableFields;
+  const photoField = fields[map.photo];
+
+  return {
+    propertyName: fields[map.propertyName] || fields[map.propertyNameFallback] || "",
+    location: fields[map.location] || "",
+    price: fields[map.price] || "",
+    type: fields[map.type] || "",
+    status: fields[map.status] || "",
+    description: fields[map.description] || "",
+    businessId: fields[map.businessId] || "",
+    photo: Array.isArray(photoField) ? photoField : [],
+    photoBase64: fields[map.photoBase64] || null
+  };
+}
+
+function parseListingPhotos(fields) {
+  let photos = Array.isArray(fields.photo) ? fields.photo : [];
+
+  if ((!photos || !photos.length) && fields.photoBase64) {
     try {
-      const baseList = typeof fields.PhotoBase64 === "string"
-        ? JSON.parse(fields.PhotoBase64)
-        : fields.PhotoBase64;
+      const baseList = typeof fields.photoBase64 === "string"
+        ? JSON.parse(fields.photoBase64)
+        : fields.photoBase64;
 
       if (Array.isArray(baseList) && baseList.length) {
         photos = baseList.map((dataUrl) => ({
@@ -104,6 +163,7 @@ function applyBranding() {
   setText("[data-brand-email]", APP_CONFIG.contactEmail);
   setText("[data-brand-map-text]", APP_CONFIG.mapText);
   setText("[data-brand-credit]", APP_CONFIG.footerCredit);
+  setText("[data-brand-field-list]", getRequiredFieldLabels());
 
   document.querySelectorAll("[data-brand-logo]").forEach((element) => {
     if (element.tagName.toLowerCase() === "img") {
