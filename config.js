@@ -22,7 +22,7 @@ const APP_CONFIG = {
   footerCredit: "Built by Ujao Defined",
   footerCreditUrl: "https://ujao-defined.com",
   airtableEditorUrl: "https://airtable.com/appYyD5JxbAtKuTuw/tblllL8gkA7B4Mwxa",
-  airtableAddFormUrl: "https://airtable.com/appYyD5JxbAtKuTuw/pagcB1c5JJyvlmIxH/form",
+  airtableAddFormUrl: "https://airtable.com/appYyD5JxbAtKuTuw/pagNw12Zy2ThyXXV/form",
   airtableBaseUrl: "https://airtable.com/appYyD5JxbAtKuTuw",
   activeListingStatus: "Active",
   airtableFields: {
