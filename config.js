@@ -1,41 +1,43 @@
 const APP_CONFIG = {
-  siteName: "Equity Merchants Ltd",
-  shortName: "Equity Merchants",
-  brandNameShort: "Equity Merchants",
-  adminAppName: "Equity Merchants Admin",
-  adminAppShortName: "Equity Admin",
-  tagline: "Property. Supplies. Solutions.",
-  heroTitle: "Property & Real Estate in Kenya",
-  description: "Equity Merchants Ltd is a Nairobi-based property and real estate company offering land, homes, rentals, development, and trusted transaction support across Kenya.",
-  listingsDescription: "Browse all active Equity Merchants Ltd property listings with filters by location, type, and price.",
-  keywords: "Equity Merchants Ltd, Nairobi real estate, Kenya property, land for sale Kenya, homes for sale Nairobi, commercial property Kenya, property management Nairobi",
-  businessId: "equity-merchants",
+  siteName: "Kings and Queens",
+  shortName: "Kings and Queens",
+  brandNameShort: "Kings and Queens",
+  adminAppName: "Kings and Queens Admin",
+  adminAppShortName: "Kings Admin",
+  tagline: "Clothing & Apparel",
+  heroTitle: "Discover fashion that fits your style",
+  description: "Kings and Queens is a clothing and apparel shop offering stylish pieces for every occasion.",
+  listingsDescription: "Browse all active inventory items with filters by size, category, and price.",
+  keywords: "Kings and Queens, clothing shop, apparel, fashion, outfits, womenswear, menswear, kidswear",
+  businessId: "kings-and-queens",
   whatsappNumber: "254759043208",
   contactEmail: "equity161@gmail.com",
   address: "55356 00200 Nairobi, Kenya",
   mapText: "Map loading - contact us for directions",
   logoSrc: "Equity Merchants.png",
-  logoAlt: "Equity Merchants Ltd logo",
+  logoAlt: "Kings and Queens logo",
   faviconSrc: "Equity Merchants.png",
   themeColor: "#003049",
-  workerBaseUrl: "https://equity-merchants-listings.ujao.workers.dev",
+  workerBaseUrl: "h https://kingsnqueens.ujao.workers.dev",
   footerCredit: "Built by Ujao Defined",
   footerCreditUrl: "https://ujao-defined.com",
-  airtableEditorUrl: "https://airtable.com/appwFq9FXqtf2cV6B/tbl7SBcj3I3jc0QbU",
-  airtableAddFormUrl: "https://airtable.com/appwFq9FXqtf2cV6B/pagWEy5JYFErSCwn4/form",
-  airtableBaseUrl: "https://airtable.com/appwFq9FXqtf2cV6B",
+  airtableEditorUrl: "https://airtable.com/appYyD5JxbAtKuTuw/tblllL8gkA7B4Mwxa",
+  airtableAddFormUrl: "https://airtable.com/appYyD5JxbAtKuTuw/pagcB1c5JJyvlmIxH/form",
+  airtableBaseUrl: "https://airtable.com/appYyD5JxbAtKuTuw",
   activeListingStatus: "Active",
   airtableFields: {
-    propertyName: "Property Name",
+    propertyName: "Product Name",
     propertyNameFallback: "Name",
-    location: "Location",
+    location: "Size",
     price: "Price",
-    type: "Type",
+    type: "Category",
     status: "Status",
     description: "Description",
     businessId: "Business ID",
     photo: "Photo",
-    photoBase64: "PhotoBase64"
+    photoBase64: "PhotoBase64",
+    color: "Color",
+    stock: "Stock"
   }
 };
 
@@ -66,7 +68,9 @@ function getRequiredFieldLabels() {
     fields.type,
     fields.description,
     fields.status,
-    fields.photo
+    fields.photo,
+    fields.color,
+    fields.stock
   ].join(", ");
 }
 
@@ -91,7 +95,9 @@ function normalizeApiFields(fields) {
     description: fields[map.description] || "",
     businessId: fields[map.businessId] || "",
     photo: Array.isArray(photoField) ? photoField : [],
-    photoBase64: fields[map.photoBase64] || null
+    photoBase64: fields[map.photoBase64] || null,
+    color: fields[map.color] || "",
+    stock: fields[map.stock] || ""
   };
 }
 

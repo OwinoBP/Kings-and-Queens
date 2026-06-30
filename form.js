@@ -140,7 +140,9 @@ async function loadListing(recordId) {
     document.getElementById('property-name').value = fields.propertyName || '';
     document.getElementById('location').value = fields.location || '';
     document.getElementById('price').value = fields.price || '';
-    document.getElementById('type').value = fields.type || 'House';
+    document.getElementById('type').value = fields.type || 'Women';
+    document.getElementById('color').value = fields.color || '';
+    document.getElementById('stock').value = fields.stock || '';
     document.getElementById('status').value = fields.status || APP_CONFIG.activeListingStatus;
     document.getElementById('description').value = fields.description || '';
     document.getElementById('photo-urls').value = Array.isArray(fields.photo)
@@ -170,7 +172,9 @@ form.addEventListener('submit', async (event) => {
     propertyName: formData.get('propertyName') || '',
     location: formData.get('location') || '',
     price: formData.get('price') || '',
-    type: formData.get('type') || 'House',
+    type: formData.get('type') || 'Women',
+    color: formData.get('color') || '',
+    stock: formData.get('stock') || '',
     status: formData.get('status') || APP_CONFIG.activeListingStatus,
     description: formData.get('description') || '',
     photoUrls: (formData.get('photoUrls') || '').split(/\n|,/).map((item) => item.trim()).filter(Boolean),

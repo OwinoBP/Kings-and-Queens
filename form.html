@@ -10,7 +10,7 @@
   <link rel="stylesheet" href="styles.css">
   <link rel="stylesheet" href="brand.css">
 </head>
-<body data-page-title="Property Form | {shortName}">
+<body data-page-title="Inventory Form | {shortName}">
   <header class="site-header">
     <div class="container nav-wrap">
       <a href="index.html" class="logo" data-brand-home-link aria-label="Home">
@@ -25,9 +25,9 @@
   <main>
     <section class="admin-hero">
       <div class="container">
-        <span class="admin-kicker">Property Entry</span>
-        <h1 class="section-heading">Add or update a listing with a shareable detail page.</h1>
-        <p class="section-copy">This form stores the listing in Airtable and creates a public detail page automatically after save.</p>
+        <span class="admin-kicker">Inventory Entry</span>
+        <h1 class="section-heading">Add or update an inventory item with a shareable detail page.</h1>
+        <p class="section-copy">This form stores the item in Airtable and creates a public detail page automatically after save.</p>
       </div>
     </section>
 
@@ -39,12 +39,12 @@
             <input type="hidden" id="business-id" name="businessId" data-brand-business-id value="">
 
             <div class="field">
-              <label for="property-name">Property Name</label>
+              <label for="property-name">Product Name</label>
               <input id="property-name" name="propertyName" required>
             </div>
 
             <div class="field">
-              <label for="location">Location</label>
+              <label for="location">Size</label>
               <input id="location" name="location" required>
             </div>
 
@@ -54,12 +54,23 @@
             </div>
 
             <div class="field">
-              <label for="type">Property Type</label>
+              <label for="type">Category</label>
               <select id="type" name="type" required>
-                <option value="House">House</option>
-                <option value="Land">Land</option>
-                <option value="Commercial">Commercial</option>
+                <option value="Women">Women</option>
+                <option value="Men">Men</option>
+                <option value="Kids">Kids</option>
+                <option value="Accessories">Accessories</option>
               </select>
+            </div>
+
+            <div class="field">
+              <label for="color">Color</label>
+              <input id="color" name="color">
+            </div>
+
+            <div class="field">
+              <label for="stock">Stock</label>
+              <input id="stock" name="stock" type="number" min="0" step="1">
             </div>
 
             <div class="field">
@@ -93,7 +104,7 @@
             </div>
 
             <div class="form-actions" style="display:flex; flex-wrap: wrap; gap: .75rem;">
-              <button class="btn btn-primary" type="submit">Save Listing</button>
+              <button class="btn btn-primary" type="submit">Save Item</button>
               <a class="btn btn-outline" href="admin.html">Open Admin</a>
             </div>
 

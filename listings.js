@@ -113,13 +113,15 @@ function normalizeListing(record) {
   return {
     id: record.id,
     createdTime: record.createdTime ? new Date(record.createdTime) : new Date(0),
-    propertyName: fields.propertyName || "Untitled Property",
-    location: fields.location || "Location available on request",
+    propertyName: fields.propertyName || "Untitled Product",
+    location: fields.location || "Size available on request",
     locationSlug: String(fields.location || "").trim().toLowerCase(),
     priceValue: Number(fields.price) || 0,
     price: formatKES(fields.price),
-    type: fields.type || "House",
-    description: fields.description || "Contact us for more information about this property.",
+    type: fields.type || "Category",
+    description: fields.description || "Contact us for more information about this item.",
+    color: fields.color || "Color on request",
+    stock: fields.stock || "Contact us",
     photos: parseListingPhotos(fields)
   };
 }
@@ -199,8 +201,11 @@ function createListingCard(listing) {
       </div>
       <div>
         <h3>${listing.propertyName}</h3>
-        <p class="listing-meta">${listing.location}</p>
+        <p class="listing-meta">Size: ${listing.location}</p>
       </div>
+      <p class="listing-copy">Category: ${listing.type}</p>
+      <p class="listing-copy">Color: ${listing.color}</p>
+      <p class="listing-copy">Stock: ${listing.stock}</p>
       <p class="listing-copy">${listing.description}</p>
       <div class="listing-actions">
         <button class="btn btn-outline" type="button">View Details</button>
@@ -334,7 +339,7 @@ function renderListingsPage() {
 
   const start = startIndex + 1;
   const end = startIndex + pageListings.length;
-  resultsSummary.textContent = `Showing ${start}-${end} of ${filteredListings.length} active listings`;
+  resultsSummary.textContent = `Showing ${start}-${end} of ${filteredListings.length} active inventory items`;
 
   listingsState.hidden = true;
   listingsGrid.hidden = false;

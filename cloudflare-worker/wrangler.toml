@@ -1,8 +1,8 @@
-name = "equity-merchants-listings"
+name = "kingsnqueens"
 main = "src/index.js"
 compatibility_date = "2026-05-12"
 
 [vars]
-ALLOWED_ORIGIN = "https://owinobrian.github.io,https://www.equitymerchants.co.ke,https://equitymerchants.co.ke"
-AIRTABLE_BASE_ID = "appwFq9FXqtf2cV6B"
-AIRTABLE_TABLE_NAME = "Listings"
+ALLOWED_ORIGIN = "https://owinobp.github.io"
+AIRTABLE_BASE_ID = "appYyD5JxbAtKuTuw"
+AIRTABLE_TABLE_NAME = "Inventory"

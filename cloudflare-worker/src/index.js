@@ -1,15 +1,17 @@
 const DEFAULT_FIELD_CONFIG = {
   fields: {
-    propertyName: "Property Name",
+    propertyName: "Product Name",
     propertyNameFallback: "Name",
-    location: "Location",
+    location: "Size",
     price: "Price",
-    type: "Type",
+    type: "Category",
     status: "Status",
     description: "Description",
     businessId: "Business ID",
     photo: "Photo",
-    photoBase64: "PhotoBase64"
+    photoBase64: "PhotoBase64",
+    color: "Color",
+    stock: "Stock"
   },
   activeStatus: "Active"
 };
@@ -195,11 +197,13 @@ function buildAirtableFields(payload, fieldConfig) {
     [map.propertyName]: payload.propertyName || "",
     [map.location]: payload.location || "",
     [map.price]: priceValue && Number.isFinite(numericPrice) ? numericPrice : "",
-    [map.type]: payload.type || "House",
+    [map.type]: payload.type || "Category",
     [map.status]: payload.status || fieldConfig.activeStatus,
     [map.description]: payload.description || "",
     [map.businessId]: payload.businessId || "",
-    [map.photo]: photoUrls.map((url) => ({ url }))
+    [map.photo]: photoUrls.map((url) => ({ url })),
+    [map.color]: payload.color || "",
+    [map.stock]: payload.stock || ""
   };
 
   if (Array.isArray(payload.photoData) && payload.photoData.length) {
@@ -238,7 +242,9 @@ function sanitizeRecord(record, fieldConfig) {
       description: raw[map.description] || "",
       businessId: raw[map.businessId] || "",
       photo,
-      photoBase64: raw[map.photoBase64] || null
+      photoBase64: raw[map.photoBase64] || null,
+      color: raw[map.color] || "",
+      stock: raw[map.stock] || ""
     }
   };
 }

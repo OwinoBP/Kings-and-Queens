@@ -3,6 +3,9 @@ const cardEl = document.getElementById('detail-card');
 const galleryEl = document.getElementById('detail-gallery');
 const titleEl = document.getElementById('detail-title');
 const locationEl = document.getElementById('detail-location');
+const categoryEl = document.getElementById('detail-category');
+const colorEl = document.getElementById('detail-color');
+const stockEl = document.getElementById('detail-stock');
 const priceEl = document.getElementById('detail-price');
 const descriptionEl = document.getElementById('detail-description');
 const whatsappEl = document.getElementById('detail-whatsapp');
@@ -132,12 +135,15 @@ async function loadDetail() {
     const fields = normalizeApiFields(record.fields || {});
     let photos = parseListingPhotos(fields);
 
-    const listingTitle = fields.propertyName || 'Property';
+    const listingTitle = fields.propertyName || 'Product';
     const listingDescription = fields.description || 'No description available.';
     const previewImage = photos[0]?.url || APP_CONFIG.logoSrc || '';
 
     titleEl.textContent = listingTitle;
-    locationEl.textContent = fields.location || 'Location available on request';
+    locationEl.textContent = `Size: ${fields.location || 'Size available on request'}`;
+    categoryEl.textContent = `Category: ${fields.type || 'Category'}`;
+    colorEl.textContent = `Color: ${fields.color || 'Color on request'}`;
+    stockEl.textContent = `Stock: ${fields.stock || 'Contact us'}`;
     priceEl.textContent = new Intl.NumberFormat('en-KE', {
       style: 'currency',
       currency: 'KES',
