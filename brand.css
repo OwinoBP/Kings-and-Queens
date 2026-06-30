@@ -1,6 +1,6 @@
 :root {
   --brand-primary: #05080a;
-  --brand-secondary: #003049;
+  --brand-secondary: hsl(204, 33%, 3%);
   --brand-accent: #ffde59;
   --brand-surface: #fffaf5;
   --brand-heading: #07203b;
