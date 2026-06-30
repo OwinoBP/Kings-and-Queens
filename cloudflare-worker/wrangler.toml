@@ -3,6 +3,6 @@ main = "src/index.js"
 compatibility_date = "2026-05-12"
 
 [vars]
-ALLOWED_ORIGIN = "https://owinobp.github.io"
+ALLOWED_ORIGIN = "https://owinobp.github.io,https://kings-and-queens.pages.dev"
 AIRTABLE_BASE_ID = "appYyD5JxbAtKuTuw"
 AIRTABLE_TABLE_NAME = "Inventory"
